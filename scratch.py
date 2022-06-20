@@ -5,14 +5,14 @@ projectjson=projectjson.read()
 projectjson=json.loads(projectjson)
 sprite=["0"]
 spritecostume=["0"]
-bg=(((projectjson.get("targets")[0]).get("costumes")[(projectjson.get("targets")[0]).get("currentCostume")]).get("assetId"))
+bg=(((projectjson.get("targets")[0]).get("costumes")[(projectjson.get("targets")[0]).get("currentCostume")]).get("md5ext"))
 for x in range(len(projectjson.get("targets"))):
 	if x == 0:
 		continue
-	spritecostume.insert(x, str(((projectjson.get("targets")[x]).get("costumes")[(projectjson.get("targets")[x]).get("currentCostume")]).get("assetId")))
+	spritecostume.insert(x, str(((projectjson.get("targets")[x]).get("costumes")[(projectjson.get("targets")[x]).get("currentCostume")]).get("md5ext")))
 	print(spritecostume)
 	print(x)
-	sprite.insert(x, ([spritecostume[x], [(projectjson.get("targets")[x]).get("x"),(projectjson.get("targets")[x]).get("y")]])) # costume, coords, rotation
+	sprite.insert(x, ([spritecostume[x], [(projectjson.get("targets")[x]).get("x"),(projectjson.get("targets")[x]).get("y")], (projectjson.get("targets")[x]).get("size"), (projectjson.get("targets")[x]).get("direction")])) # costume, coords, rotation, size
 pygame.init()
 
 
@@ -25,13 +25,13 @@ while running:
 		if event.type == pygame.QUIT:
 			running = False
 	screen.fill((255, 255, 255))
-	screen.blit(pygame.image.load(("./project/" + bg + ".png")), (0,0))
+	screen.blit(pygame.image.load("./project/" + bg), (0,0))
 	for x in range(len(projectjson.get("targets"))):
 		if x == 0:
 			continue
-		try:
-			screen.blit(pygame.image.load(("./project/" + spritecostume[x] + ".png")), ((sprite[x][1][0]*2+360),(360-(sprite[x][1][1]*2))))
-		except:
-			screen.blit(pygame.image.load(("./project/" + spritecostume[x] + ".svg")), ((sprite[x][1][0]*2+360),(360-(sprite[x][1][1]*2))))
+		costume = pygame.image.load(("./project/" + spritecostume[x]))
+		costume = pygame.transform.scale(costume, (costume.get_width()*(sprite[x][3]/50),costume.get_height()*(sprite[x][3]/50)))
+		costume = pygame.transform.rotate(costume, sprite[x][3]-90)
+		screen.blit(costume, ((sprite[x][1][0]*2+360)-costume.get_width()/2,(360-(sprite[x][1][1]*2)-costume.get_height()/2)))
 	pygame.display.flip()
 pygame.quit()
